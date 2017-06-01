@@ -1,0 +1,41 @@
+---
+
+- name: Install unzip package
+  apt: pkg='{{ item }}' state=present
+  with_items:
+    - unzip
+  sudo: yes
+
+- name: Check for janusgraph-vagrant.done
+  shell: 'ls {{ janusgraph_home_dir }}/conf/janusgraph-vagrant.done'
+  ignore_errors: yes
+  register: janusgraph_done_check
+
+- name: download janusgraph release {{ janusgraph_release }}
+  when: janusgraph_done_check.rc != 0
+  get_url: url='http://github.com/JanusGraph/janusgraph/releases/download/v{{ janusgraph_release }}/{{ janusgraph_archive }}'
+           dest='/home/vagrant/{{ janusgraph_archive }}'
+           sha256sum='{{ janusgraph_sha256 }}'
+           validate_certs=false
+
+- name: extract JanusGraph archive
+  when: janusgraph_done_check.rc != 0
+  command: unzip '/home/vagrant/{{ janusgraph_archive }}'
+           chdir=/home/vagrant/
+           creates='{{ janusgraph_home_dir }}'
+
+- name: symlink janusgraph home directory to just janusgraph/
+  when: janusgraph_done_check.rc != 0
+  file: path=/home/vagrant/janusgraph src='{{ janusgraph_home_dir }}' state=link
+
+- name: start janusgraph
+  command: ./bin/janusgraph.sh start
+           chdir={{ janusgraph_home_dir }}
+  register: janusgraph_start
+  changed_when: janusgraph_start.stdout.find('Run gremlin.sh to connect') == -1
+
+- name: write janusgraph done file
+  when: janusgraph_done_check.rc != 0
+  template: src=janusgraph-vagrant.done
+            dest='{{ janusgraph_home_dir }}/conf/janusgraph-vagrant.done'
+

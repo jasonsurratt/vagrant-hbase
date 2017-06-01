@@ -24,24 +24,30 @@
   apt_repository: repo=ppa:webupd8team/java state=present
   sudo: yes
 
+- name: Check if java is installed
+  command: ls /usr/lib/jvm/java-8-oracle/jre
+  ignore_errors: yes
+  register: java_check
+
 - name: check if Java license is accepted
-  shell: '/usr/bin/debconf-get-selections | grep oracle-java7-installer'
+  shell: '/usr/bin/debconf-get-selections | grep oracle-java8-installer'
   sudo: yes
   register: java_license_check
   changed_when: java_license_check.rc != 0
   failed_when: java_license_check.rc > 1
 
 - name: automatically accept Java license
-  shell: 'echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections'
+  shell: 'echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections'
   sudo: yes
   when: java_license_check.rc != 0
 
 
-- name: install Java 7
+- name: install Java 8
   apt: pkg='{{ item }}' state=present update_cache=yes force=yes
+  when: java_check.rc != 0
   with_items:
-    - oracle-java7-installer
-    - oracle-java7-set-default
+    - oracle-java8-installer
+    - oracle-java8-set-default
     - jython
   sudo: yes
 

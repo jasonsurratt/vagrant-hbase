@@ -1,0 +1,5 @@
+---
+janusgraph_release: 0.1.1
+janusgraph_archive: 'janusgraph-{{ janusgraph_release }}-hadoop2.zip'
+janusgraph_sha256: 'caba2c30d2bd4212458405ac8af05feb41f4fc1422587569620f4063875a8b2c'
+janusgraph_home_dir: '/home/vagrant/janusgraph-{{ janusgraph_release }}-hadoop2'

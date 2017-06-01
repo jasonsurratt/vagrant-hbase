@@ -22,12 +22,14 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 9090, host: 9190
   #ZooKeeper
   config.vm.network :forwarded_port, guest: 2181, host: 2281
+  #Gremlin Server
+  config.vm.network :forwarded_port, guest: 8182, host: 8182
 
   config.ssh.forward_agent = true
 
   # increase available memory
   config.vm.provider :virtualbox do |vb|
-     vb.customize ["modifyvm", :id, "--memory", "1024"]
+     vb.customize ["modifyvm", :id, "--memory", "4096"]
   end
   is_windows = (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
   if is_windows

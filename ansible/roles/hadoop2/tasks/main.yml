@@ -21,7 +21,7 @@
 - name: set JAVA_HOME environment variable for Hadoop
   lineinfile: dest='{{ hadoop_home_dir }}/etc/hadoop/hadoop-env.sh'
               regexp='^#?\s*export JAVA_HOME='
-              line='export JAVA_HOME=/usr/lib/jvm/java-7-oracle/jre'
+              line='export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre'
               state=present
 
 - name: write Hadoop core config file
