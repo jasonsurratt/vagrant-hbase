@@ -34,6 +34,16 @@
   register: janusgraph_start
   changed_when: janusgraph_start.stdout.find('Run gremlin.sh to connect') == -1
 
+- name: Check for janusgraph-hbase-vagrant.properties
+  shell: 'ls {{ janusgraph_home_dir }}/conf/janusgraph-hbase-vagrant.properties'
+  ignore_errors: yes
+  register: janusgraph_hbase_vagrant_properties_check
+
+- name: Write HBase ElasticSearch properties file
+  when: janusgraph_hbase_vagrant_properties_check.rc != 0
+  template: src=janusgraph-hbase-vagrant.properties
+            dest='{{ janusgraph_home_dir }}/conf/janusgraph-hbase-vagrant.properties'
+
 - name: write janusgraph done file
   when: janusgraph_done_check.rc != 0
   template: src=janusgraph-vagrant.done
